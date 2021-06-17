@@ -223,20 +223,20 @@ void FixedBuffer<SIZE>::cookieEnd()
 
 void LogStream::staticCheck()
 {
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10,
-                "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10,
-                "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long>::digits10,
-                "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10,
-                "kMaxNumericSize is large enough");
+  static_assert(std::numeric_limits<long double>::digits10 + 11 - 10 > std::numeric_limits<double>::digits10,
+                "std::numeric_limits<long double>::digits10 + 11 is large enough");
+  static_assert(std::numeric_limits<long double>::digits10 + 11 - 10 > std::numeric_limits<long double>::digits10,
+                "std::numeric_limits<long double>::digits10 + 11 is large enough");
+  static_assert(std::numeric_limits<long double>::digits10 + 11 - 10 > std::numeric_limits<long>::digits10,
+                "std::numeric_limits<long double>::digits10 + 11 is large enough");
+  static_assert(std::numeric_limits<long double>::digits10 + 11 - 10 > std::numeric_limits<long long>::digits10,
+                "std::numeric_limits<long double>::digits10 + 11 is large enough");
 }
 
 template<typename T>
 void LogStream::formatInteger(T v)
 {
-  if (buffer_.avail() >= kMaxNumericSize)
+  if (buffer_.avail() >= std::numeric_limits<long double>::digits10 + 11)
   {
     size_t len = convert(buffer_.current(), v);
     buffer_.add(len);
@@ -294,7 +294,7 @@ LogStream& LogStream::operator<<(unsigned long long v)
 LogStream& LogStream::operator<<(const void* p)
 {
   uintptr_t v = reinterpret_cast<uintptr_t>(p);
-  if (buffer_.avail() >= kMaxNumericSize)
+  if (buffer_.avail() >= std::numeric_limits<long double>::digits10 + 11)
   {
     char* buf = buffer_.current();
     buf[0] = '0';
@@ -308,9 +308,9 @@ LogStream& LogStream::operator<<(const void* p)
 // FIXME: replace this with Grisu3 by Florian Loitsch.
 LogStream& LogStream::operator<<(double v)
 {
-  if (buffer_.avail() >= kMaxNumericSize)
+  if (buffer_.avail() >= std::numeric_limits<long double>::digits10 + 11)
   {
-    int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);
+    int len = snprintf(buffer_.current(), std::numeric_limits<long double>::digits10 + 11, "%.12g", v);
     buffer_.add(len);
   }
   return *this;
